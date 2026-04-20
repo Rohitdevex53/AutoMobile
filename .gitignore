@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Django
+*.sqlite3
+db.sqlite3
+
+# Media/Static files
+/media/
+/static/
+!/static/js/
+!/static/css/
+!/static/img/
+
+# Environment variables
+.env
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+implementation_plan.md
+rules.txt
+details.txt
