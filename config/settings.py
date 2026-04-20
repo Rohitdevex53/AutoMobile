@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-o&w=2cy*v^*(x%*wv3=5grbm^^zh)s3_m%5@hjkfopukr+q_j@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,6 +80,16 @@ TEMPLATES = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://*.localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://*.127.0.0.1:8000",
+    "https://*.ngrok-free.app",
+    "https://*.ngrok-free.dev",
+    "https://*.ngrok.io",
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

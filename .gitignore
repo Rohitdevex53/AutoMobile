@@ -12,12 +12,7 @@ ENV/
 *.sqlite3
 db.sqlite3
 
-# Media/Static files
-/media/
-/static/
-!/static/js/
-!/static/css/
-!/static/img/
+
 
 # Environment variables
 .env
