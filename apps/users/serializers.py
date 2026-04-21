@@ -6,7 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'phone', 'role', 'is_superuser', 'created_at')
+        fields = ('id', 'email', 'name', 'phone', 'role', 'is_active', 'is_superuser', 'created_at')
         read_only_fields = ('id', 'created_at')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -25,3 +25,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)

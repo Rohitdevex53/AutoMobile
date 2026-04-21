@@ -3,15 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <script>
+        // Auth Guard: Redirect to login if no token is found
+        if (!localStorage.getItem('access_token')) {
+            window.location.replace('/login/');
+        }
+        // Handle browser back-forward cache (bfcache)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted && !localStorage.getItem('access_token')) {
+                window.location.replace('/login/');
+            }
+        });
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <h2>Welcome, Admin!</h2>
-    <p>This is your dashboard.</p>
-    <button id="logout-btn" class="btn btn-danger mt-3">Logout</button>
-</div>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="/static/js/api.js"></script>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">AutoMobile</div>
+        <nav>
+            <a href="#" class="nav-link active" id="link-dashboard">
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-link" id="link-users">
+                <span>Users</span>
+            </a>
+            <a href="#" class="nav-link" id="link-mechanics">
+                <span>Mechanics</span>
+            </a>
+            <a href="#" class="nav-link" id="link-settings">
+                <span>Settings</span>
+            </a>
+        </nav>
+        <a href="#" id="logout-btn" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="dashboard-section">
+            <div class="page-header">
+                <h1>Admin Dashboard</h1>
+                <p class="text-dim">Overview of your platform activity</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="total-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-value" id="total-customers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Mechanics</div>
+                    <div class="stat-value" id="total-mechanics">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Active</div>
+                    <div class="stat-value" id="pending-active">0</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h3 class="mb-4">Recent Users</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-user-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="section-users" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>User Management</h1>
+                <p class="text-dim">Manage all platform customers and admins</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-user-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-dim small" id="users-pagination-info">Showing page 1</div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item"><button class="btn-action prev-page" data-section="users" disabled>Previous</button></li>
+                            <li class="page-item ms-2"><button class="btn-action next-page" data-section="users">Next</button></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mechanics Section -->
+        <div id="section-mechanics" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Mechanic Management</h1>
+                <p class="text-dim">Approve and monitor service providers</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mechanic</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mechanic-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-dim small" id="mechanics-pagination-info">Showing page 1</div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item"><button class="btn-action prev-page" data-section="mechanics" disabled>Previous</button></li>
+                            <li class="page-item ms-2"><button class="btn-action next-page" data-section="mechanics">Next</button></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="section-settings" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Settings</h1>
+                <p class="text-dim">Configure platform parameters</p>
+            </div>
+            <div class="content-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <label class="form-label text-dim">Platform Name</label>
+                            <input type="text" class="form-control" value="AutoMobile" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-dim">Admin Email</label>
+                            <input type="text" class="form-control" value="admin@automobile.com" readonly>
+                        </div>
+                        <button class="btn btn-auth" style="width: auto; padding: 10px 24px;">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/admin_dashboard.js"></script>
 </body>
 </html>

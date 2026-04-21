@@ -20,14 +20,66 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response) {
-                $('#register-message').html('<div class="text-success">Registration successful! Redirecting...</div>');
+                $('#register-message').html('<div class="text-success">' + response.message + ' Redirecting...</div>');
                 $('#register-form')[0].reset();
                 setTimeout(function() {
-                    window.location.href = '/login/';
+                    window.location.href = '/verify-otp/?email=' + encodeURIComponent(response.email);
                 }, 1500);
             },
             error: function(xhr) {
                 $('#register-message').html('<div class="text-danger">Error: ' + JSON.stringify(xhr.responseJSON) + '</div>');
+            }
+        });
+    });
+
+    // Verify OTP
+    $('#verify-otp-form').on('submit', function(e) {
+        e.preventDefault();
+        $('#verify-message').empty();
+        let data = formToJSON($(this).serializeArray());
+        
+        $.ajax({
+            url: '/auth/verify-otp/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                $('#verify-message').html('<div class="text-success">' + response.message + ' Redirecting to login...</div>');
+                $('#verify-otp-form')[0].reset();
+                setTimeout(function() {
+                    window.location.href = '/login/';
+                }, 2000);
+            },
+            error: function(xhr) {
+                $('#verify-message').html('<div class="text-danger">Error: ' + (xhr.responseJSON.error || JSON.stringify(xhr.responseJSON)) + '</div>');
+            }
+        });
+    });
+
+    // Resend OTP
+    $('#resend-otp-link').on('click', function(e) {
+        e.preventDefault();
+        let email = $('#otp-email').val();
+        if(!email) {
+            alert('Email is missing. Please restart signup.');
+            return;
+        }
+
+        $(this).text('Sending...');
+        let $link = $(this);
+
+        $.ajax({
+            url: '/auth/resend-otp/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ email: email }),
+            success: function(response) {
+                $('#verify-message').html('<div class="text-success">' + response.message + '</div>');
+                $link.text('Resend OTP');
+            },
+            error: function(xhr) {
+                $('#verify-message').html('<div class="text-danger">Error: ' + (xhr.responseJSON.error || JSON.stringify(xhr.responseJSON)) + '</div>');
+                $link.text('Resend OTP');
             }
         });
     });
@@ -83,6 +135,6 @@ $(document).ready(function() {
         document.cookie.split(";").forEach(function(c) { 
             document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
         });
-        window.location.href = '/login/';
+        window.location.replace('/login/');
     });
 });

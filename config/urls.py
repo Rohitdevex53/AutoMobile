@@ -24,6 +24,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='login.html'), name='home'),
     path('login/', TemplateView.as_view(template_name='login.html'), name='login'),
     path('signup/', TemplateView.as_view(template_name='signup.html'), name='signup'),
+    path('verify-otp/', TemplateView.as_view(template_name='verify_otp.html'), name='verify_otp_ui'),
     path('customer/dashboard/', TemplateView.as_view(template_name='customer_dashboard.html'), name='customer_dashboard'),
     path('mechanic/dashboard/', TemplateView.as_view(template_name='mechanic_dashboard.html'), name='mechanic_dashboard'),
     path('dashboard/admin/', TemplateView.as_view(template_name='admin_dashboard.html'), name='admin_dashboard'),
