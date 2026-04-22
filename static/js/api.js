@@ -44,10 +44,18 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response) {
-                $('#verify-message').html('<div class="text-success">' + response.message + ' Redirecting to login...</div>');
+                const message = 'Email verified! Redirecting to login...';
+                $('#verify-message').html('<div class="text-success">' + message + '</div>');
                 $('#verify-otp-form')[0].reset();
+                
+                // We no longer save tokens here to follow the manual login flow requested by the user
+                
                 setTimeout(function() {
-                    window.location.href = '/login/';
+                    if (response.role === 'mechanic') {
+                        window.location.href = '/mechanic/onboarding/';
+                    } else {
+                        window.location.href = '/login/';
+                    }
                 }, 2000);
             },
             error: function(xhr) {

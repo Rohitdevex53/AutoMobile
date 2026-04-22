@@ -23,17 +23,36 @@
     <div class="sidebar">
         <div class="sidebar-logo">AutoMobile</div>
         <nav>
+            <div class="nav-section-title mb-2 mt-2 text-dim small fw-bold px-3">MAIN</div>
             <a href="#" class="nav-link active" id="link-dashboard">
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-link" id="link-users">
-                <span>Users</span>
-            </a>
+            
+            <div class="nav-section-title mb-2 mt-3 text-dim small fw-bold px-3">MARKETPLACE</div>
             <a href="#" class="nav-link" id="link-mechanics">
                 <span>Mechanics</span>
             </a>
+            <a href="#" class="nav-link" id="link-verifications">
+                <span>Verifications</span>
+            </a>
+            
+            <div class="nav-section-title mb-2 mt-3 text-dim small fw-bold px-3">OPERATIONS</div>
+            <a href="#" class="nav-link" id="link-bookings">
+                <span>Bookings</span>
+            </a>
+            <a href="#" class="nav-link" id="link-disputes">
+                <span>Disputes</span>
+            </a>
+            <a href="#" class="nav-link" id="link-payments">
+                <span>Payments</span>
+            </a>
+            
+            <div class="nav-section-title mb-2 mt-3 text-dim small fw-bold px-3">PLATFORM</div>
+            <a href="#" class="nav-link" id="link-users">
+                <span>Users</span>
+            </a>
             <a href="#" class="nav-link" id="link-settings">
-                <span>Settings</span>
+                <span>Config</span>
             </a>
         </nav>
         <a href="#" id="logout-btn" class="logout-btn">Logout</a>
@@ -155,6 +174,107 @@
                 </div>
             </div>
         </div>
+        <!-- Verifications Section -->
+        <div id="section-verifications" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Mechanic Verifications</h1>
+                <p class="text-dim">Review pending mechanic applications</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mechanic</th>
+                                <th>Location Details</th>
+                                <th>Docs</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verifications-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="section-bookings" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Live Bookings</h1>
+                <p class="text-dim">Monitor ongoing operations and overrides</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer - Mechanic</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disputes Section -->
+        <div id="section-disputes" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Disputes</h1>
+                <p class="text-dim">Resolve user and mechanic conflicts</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Booking</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disputes-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Section -->
+        <div id="section-payments" class="dashboard-section" style="display: none;">
+            <div class="page-header">
+                <h1>Payments</h1>
+                <p class="text-dim">Transaction monitor</p>
+            </div>
+            <div class="content-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Txn ID</th>
+                                <th>Booking</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <!-- Settings Section -->
         <div id="section-settings" class="dashboard-section" style="display: none;">
@@ -166,14 +286,17 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-4">
-                            <label class="form-label text-dim">Platform Name</label>
-                            <input type="text" class="form-control" value="AutoMobile" readonly>
+                            <label class="form-label text-dim">Platform Fee Type</label>
+                            <select class="form-select bg-dark text-white border-secondary" id="config-fee-type">
+                                <option value="PERCENTAGE">Percentage (%)</option>
+                                <option value="FLAT">Flat Fee ($)</option>
+                            </select>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label text-dim">Admin Email</label>
-                            <input type="text" class="form-control" value="admin@automobile.com" readonly>
+                            <label class="form-label text-dim">Fee Value</label>
+                            <input type="number" step="0.01" class="form-control" id="config-fee-value" placeholder="e.g. 10.00">
                         </div>
-                        <button class="btn btn-auth" style="width: auto; padding: 10px 24px;">Save Changes</button>
+                        <button class="btn btn-auth" style="width: auto; padding: 10px 24px;">Save Configuration</button>
                     </div>
                 </div>
             </div>

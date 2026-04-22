@@ -66,7 +66,17 @@ class VerifyOTPView(generics.GenericAPIView):
                 user.save()
                 # Delete OTPs after successful verification
                 user.otps.all().delete()
-                return Response({"message": "Email verified successfully! You can now login."}, status=status.HTTP_200_OK)
+                # Automatically log the user in by returning tokens
+                from rest_framework_simplejwt.tokens import RefreshToken
+                refresh = RefreshToken.for_user(user)
+                
+                return Response({
+                    "message": "Email verified successfully!",
+                    "role": user.role,
+                    "is_active": user.is_active,
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh)
+                }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "OTP has expired."}, status=status.HTTP_400_BAD_REQUEST)
                 

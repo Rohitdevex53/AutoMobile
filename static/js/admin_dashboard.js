@@ -23,6 +23,16 @@ $(document).ready(function() {
             fetchUsers(null, '#full-user-table-body', currentPageUsers);
         } else if (sectionId === 'section-mechanics') {
             fetchUsers('mechanic', '#mechanic-table-body', currentPageMechanics);
+        } else if (sectionId === 'section-verifications') {
+            fetchVerifications();
+        } else if (sectionId === 'section-bookings') {
+            fetchBookings();
+        } else if (sectionId === 'section-disputes') {
+            fetchDisputes();
+        } else if (sectionId === 'section-payments') {
+            fetchPayments();
+        } else if (sectionId === 'section-settings') {
+            fetchConfig();
         }
     });
 
@@ -165,6 +175,226 @@ $(document).ready(function() {
                 fetchStats();
                 fetchUsers(role, tableBodyId, page);
             }
+        });
+    });
+
+    // API Fetchers for new modules
+    function fetchVerifications() {
+        $.ajax({
+            url: '/auth/admin/mechanics/verifications/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function(data) {
+                const tbody = $('#verifications-table-body');
+                tbody.empty();
+                const verifications = data.results || data;
+
+                if (!verifications || verifications.length === 0) {
+                    tbody.append('<tr><td colspan="4" class="text-center py-4 text-dim">No pending applications</td></tr>');
+                    return;
+                }
+
+                verifications.forEach(v => {
+                    const statusClass = v.verification_status === 'VERIFIED' ? 'text-success' : (v.verification_status === 'REJECTED' ? 'text-danger' : 'text-warning');
+                    const addressText = v.address || 'No address provided';
+                    const coords = (v.latitude && v.longitude) ? `${v.latitude}, ${v.longitude}` : 'No coordinates';
+                    const lat = v.latitude;
+                    const lon = v.longitude;
+                    const mapLink = (lat && lon) ? `<a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" class="text-accent small text-decoration-none">🗺️ View on Map</a>` : '';
+                    
+                    const row = `
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">${v.user ? v.user.name : 'Unknown'}</div>
+                                <div class="text-dim small">${v.user ? v.user.email : ''}</div>
+                                <div class="badge badge-sm ${statusClass} p-0" style="font-size: 10px; background: none; border:none;">${v.verification_status}</div>
+                            </td>
+                            <td>
+                                <div class="small fw-semibold text-wrap" style="max-width: 250px;">${addressText}</div>
+                                <div class="text-dim x-small mb-1" style="font-size: 11px;">📍 ${coords}</div>
+                                ${mapLink}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    ${v.license_doc ? `<a href="${v.license_doc}" target="_blank" class="text-info small text-decoration-none">🪪 License Doc</a>` : '<span class="text-dim small">No License</span>'}
+                                    ${v.id_doc ? `<a href="${v.id_doc}" target="_blank" class="text-info small text-decoration-none">🆔 Identity Doc</a>` : '<span class="text-dim small">No ID</span>'}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn-action verify-action btn-sm py-1 px-2" data-id="${v.id}" data-action="APPROVE">Approve</button>
+                                    <button class="btn-action verify-action btn-sm py-1 px-2 text-danger" data-id="${v.id}" data-action="REJECT">Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+        });
+    }
+
+    function fetchBookings() {
+        $.ajax({
+            url: '/auth/admin/bookings/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function(data) {
+                const tbody = $('#bookings-table-body');
+                tbody.empty();
+                const bookings = data.results || data;
+
+                if (!bookings || bookings.length === 0) {
+                    tbody.append('<tr><td colspan="5" class="text-center py-4 text-dim">No bookings found</td></tr>');
+                    return;
+                }
+
+                bookings.forEach(b => {
+                    const row = `
+                        <tr>
+                            <td class="fw-bold text-accent">#${b.id}</td>
+                            <td>
+                                <div><span class="text-dim">C:</span> ${b.customer ? b.customer.name : 'N/A'}</div>
+                                <div><span class="text-dim">M:</span> ${b.mechanic ? b.mechanic.name : 'Unassigned'}</div>
+                            </td>
+                            <td><span class="role-badge" style="background:rgba(255,255,255,0.1)">${b.status}</span></td>
+                            <td>${new Date(b.created_at).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn-action booking-override" data-id="${b.id}" data-status="CANCELLED" title="Force Cancel">🛑 Cancel</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+        });
+    }
+
+    function fetchDisputes() {
+        $.ajax({
+            url: '/auth/admin/disputes/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function(data) {
+                const tbody = $('#disputes-table-body');
+                tbody.empty();
+                const disputes = data.results || data;
+
+                if (!disputes || disputes.length === 0) {
+                    tbody.append('<tr><td colspan="5" class="text-center py-4 text-dim">No disputes found</td></tr>');
+                    return;
+                }
+
+                disputes.forEach(d => {
+                    const row = `
+                        <tr>
+                            <td>#${d.id}</td>
+                            <td><a href="#" class="text-info text-decoration-none">Booking #${d.booking ? d.booking.id : 'N/A'}</a></td>
+                            <td class="fw-bold text-warning">${d.status}</td>
+                            <td><div class="text-truncate" style="max-width: 200px;" title="${d.customer_complaint}">${d.customer_complaint}</div></td>
+                            <td>
+                                <button class="btn-action dispute-action" data-id="${d.id}" data-action="RESOLVE">Resolve</button>
+                                <button class="btn-action dispute-action border-warning text-warning" data-id="${d.id}" data-action="REFUND">Refund</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+        });
+    }
+
+    function fetchPayments() {
+        $.ajax({
+            url: '/auth/admin/payments/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function(data) {
+                const tbody = $('#payments-table-body');
+                tbody.empty();
+                const payments = data.results || data;
+
+                if (!payments || payments.length === 0) {
+                    tbody.append('<tr><td colspan="4" class="text-center py-4 text-dim">No payments found</td></tr>');
+                    return;
+                }
+
+                payments.forEach(p => {
+                    const row = `
+                        <tr>
+                            <td class="text-dim">${p.transaction_id || 'N/A'}</td>
+                            <td>Booking #${p.booking_id}</td>
+                            <td class="fw-bold">$${p.amount}</td>
+                            <td class="${p.status === 'SUCCESS' ? 'text-success' : 'text-danger'}">${p.status}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+        });
+    }
+
+    function fetchConfig() {
+        $.ajax({
+            url: '/auth/admin/config/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function(data) {
+                // Populate the settings form
+                $('#config-fee-type').val(data.fee_type);
+                $('#config-fee-value').val(data.fee_value);
+            }
+        });
+    }
+
+    // Action Handlers
+    $(document).on('click', '.verify-action', function() {
+        const id = $(this).data('id');
+        const action = $(this).data('action');
+        let notes = '';
+        if (action === 'REJECT') {
+            notes = prompt('Enter rejection reason (Internal Note):');
+            if (notes === null) return;
+        }
+
+        $.ajax({
+            url: `/auth/admin/mechanics/${id}/verify/`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ action: action, notes: notes }),
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function() { fetchVerifications(); }
+        });
+    });
+
+    $(document).on('click', '.booking-override', function() {
+        if (!confirm('Are you sure you want to force override this booking?')) return;
+        const id = $(this).data('id');
+        const status = $(this).data('status');
+        
+        $.ajax({
+            url: `/auth/admin/bookings/${id}/override/`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ status: status }),
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function() { fetchBookings(); }
+        });
+    });
+
+    $(document).on('click', '.dispute-action', function() {
+        const id = $(this).data('id');
+        const action = $(this).data('action');
+        const confirmMsg = action === 'REFUND' ? 'Issue a refund and close dispute?' : 'Mark dispute as resolved?';
+        if (!confirm(confirmMsg)) return;
+
+        $.ajax({
+            url: `/auth/admin/disputes/${id}/action/`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ action: action, notes: `Action taken by admin: ${action}` }),
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') },
+            success: function() { fetchDisputes(); fetchPayments(); }
         });
     });
 

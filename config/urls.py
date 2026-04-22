@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +29,9 @@ urlpatterns = [
     path('verify-otp/', TemplateView.as_view(template_name='verify_otp.html'), name='verify_otp_ui'),
     path('customer/dashboard/', TemplateView.as_view(template_name='customer_dashboard.html'), name='customer_dashboard'),
     path('mechanic/dashboard/', TemplateView.as_view(template_name='mechanic_dashboard.html'), name='mechanic_dashboard'),
+    path('mechanic/onboarding/', TemplateView.as_view(template_name='mechanic_onboarding.html'), name='mechanic_onboarding'),
     path('dashboard/admin/', TemplateView.as_view(template_name='admin_dashboard.html'), name='admin_dashboard'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
