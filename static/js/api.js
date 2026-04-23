@@ -44,16 +44,25 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response) {
-                const message = 'Email verified! Redirecting to login...';
+                console.log("OTP Verification Response:", response);
+                const isMechanic = response.role === 'mechanic';
+                const message = isMechanic ? 'Email verified! Redirecting to onboarding...' : 'Email verified! Redirecting to login...';
                 $('#verify-message').html('<div class="text-success">' + message + '</div>');
                 $('#verify-otp-form')[0].reset();
                 
-                // We no longer save tokens here to follow the manual login flow requested by the user
+                // Save tokens so onboarding can be completed (requires authentication)
+                console.log("Saving tokens to localStorage...");
+                localStorage.setItem('access_token', response.access);
+                localStorage.setItem('refresh_token', response.refresh);
                 
                 setTimeout(function() {
-                    if (response.role === 'mechanic') {
+                    if (isMechanic) {
+                        console.log("Redirecting to onboarding...");
                         window.location.href = '/mechanic/onboarding/';
                     } else {
+                        // For non-mechanics, we clear tokens and send to login as per original flow
+                        console.log("Not a mechanic, clearing tokens and redirecting to login...");
+                        localStorage.clear();
                         window.location.href = '/login/';
                     }
                 }, 2000);

@@ -222,8 +222,10 @@ $(document).ready(function() {
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <button class="btn-action verify-action btn-sm py-1 px-2" data-id="${v.id}" data-action="APPROVE">Approve</button>
-                                    <button class="btn-action verify-action btn-sm py-1 px-2 text-danger" data-id="${v.id}" data-action="REJECT">Reject</button>
+                                    ${v.verification_status === 'PENDING' ? `
+                                        <button class="btn-action verify-action btn-sm py-1 px-2" data-id="${v.id}" data-action="APPROVE">Approve</button>
+                                        <button class="btn-action verify-action btn-sm py-1 px-2 text-danger" data-id="${v.id}" data-action="REJECT">Reject</button>
+                                    ` : '<span class="text-dim small">No action needed</span>'}
                                 </div>
                             </td>
                         </tr>
