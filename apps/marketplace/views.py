@@ -1,9 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from apps.users.views import IsAdmin
-from .models import MechanicProfile
-from .serializers import MechanicProfileSerializer
+from apps.users.views import IsAdmin, IsMechanic
+from .models import MechanicProfile, MechanicService
+from .serializers import MechanicProfileSerializer, MechanicServiceSerializer
 
 class AdminMechanicVerificationListView(generics.ListAPIView):
     permission_classes = (IsAdmin,)
@@ -63,3 +63,45 @@ class MechanicOnboardingView(generics.RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         # When mechanic updates profile, ensure status is PENDING for review
         serializer.save(verification_status='PENDING')
+
+class MechanicAvailabilityToggleView(generics.GenericAPIView):
+    permission_classes = (IsMechanic,)
+
+    def patch(self, request):
+        try:
+            profile = MechanicProfile.objects.get(user=request.user)
+            is_available = request.data.get('is_available')
+            
+            if is_available is None:
+                return Response({'error': 'is_available field is required'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            profile.is_available = is_available
+            profile.save()
+            
+            return Response({
+                'message': f"Availability set to {'ON' if profile.is_available else 'OFF'}",
+                'is_available': profile.is_available
+            })
+        except MechanicProfile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class MechanicServiceListView(generics.ListCreateAPIView):
+    permission_classes = (IsMechanic,)
+    serializer_class = MechanicServiceSerializer
+
+    def get_queryset(self):
+        profile, _ = MechanicProfile.objects.get_or_create(user=self.request.user)
+        return MechanicService.objects.filter(mechanic=profile)
+
+    def perform_create(self, serializer):
+        profile, created = MechanicProfile.objects.get_or_create(user=self.request.user)
+        print(f"Adding service for mechanic: {self.request.user.email}, Profile created: {created}")
+        serializer.save(mechanic=profile)
+
+class MechanicServiceDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsMechanic,)
+    serializer_class = MechanicServiceSerializer
+
+    def get_queryset(self):
+        profile, _ = MechanicProfile.objects.get_or_create(user=self.request.user)
+        return MechanicService.objects.filter(mechanic=profile)

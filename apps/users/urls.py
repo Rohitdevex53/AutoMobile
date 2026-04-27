@@ -9,10 +9,14 @@ from .views import (
 )
 
 from apps.marketplace.views import (
-    AdminMechanicVerificationListView, AdminMechanicVerifyActionView, 
-    AdminMechanicDetailView, MechanicOnboardingView
+    MechanicOnboardingView, MechanicAvailabilityToggleView,
+    AdminMechanicVerificationListView, AdminMechanicVerifyActionView, AdminMechanicDetailView,
+    MechanicServiceListView, MechanicServiceDetailView
 )
-from apps.bookings.views import AdminBookingListView, AdminBookingOverrideView
+from apps.bookings.views import (
+    AdminBookingListView, AdminBookingOverrideView,
+    MechanicJobListView, MechanicJobDetailView, MechanicJobUpdateStatusView, MechanicEarningsView
+)
 from apps.operations.views import AdminDisputeListView, AdminDisputeActionView, AdminPaymentListView
 from apps.core.views import AdminPlatformConfigView
 
@@ -24,6 +28,15 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', CurrentUserView.as_view(), name='current_user'),
     path('mechanic/onboarding/', MechanicOnboardingView.as_view(), name='mechanic_onboarding_api'),
+    
+    # Mechanic API
+    path('mechanic/jobs/', MechanicJobListView.as_view(), name='mechanic_jobs'),
+    path('mechanic/jobs/<int:pk>/', MechanicJobDetailView.as_view(), name='mechanic_job_detail'),
+    path('mechanic/jobs/<int:pk>/status/', MechanicJobUpdateStatusView.as_view(), name='mechanic_job_status'),
+    path('mechanic/availability/', MechanicAvailabilityToggleView.as_view(), name='mechanic_availability'),
+    path('mechanic/earnings/', MechanicEarningsView.as_view(), name='mechanic_earnings'),
+    path('mechanic/services/', MechanicServiceListView.as_view(), name='mechanic_services'),
+    path('mechanic/services/<int:pk>/', MechanicServiceDetailView.as_view(), name='mechanic_service_detail'),
     # Admin API - Users
     path('admin/stats/', AdminStatsView.as_view(), name='admin_stats'),
     path('admin/users/', AdminUserListView.as_view(), name='admin_users'),

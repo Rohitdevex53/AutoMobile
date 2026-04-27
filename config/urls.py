@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('apps.users.urls')),
-    path('', TemplateView.as_view(template_name='login.html'), name='home'),
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('login/', TemplateView.as_view(template_name='login.html'), name='login'),
     path('signup/', TemplateView.as_view(template_name='signup.html'), name='signup'),
     path('verify-otp/', TemplateView.as_view(template_name='verify_otp.html'), name='verify_otp_ui'),
